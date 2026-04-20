@@ -1,17 +1,26 @@
 const express = require('express');
 const cors = require('cors');
 const QRCode = require('qrcode');
+const connectDB = require('./db/connection');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Conectar MongoDB
+connectDB();
+
 // Rutas
 const menuRoutes = require('./routes/menu');
 const orderRoutes = require('./routes/orders');
+const usuarioRoutes = require('./routes/usuarios');
+const pedidoRoutes = require('./routes/pedidos');
+
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/pedidos', pedidoRoutes);
 
 // Chatbot QR
 let qrImageData = '';
