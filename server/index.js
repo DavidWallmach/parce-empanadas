@@ -15,10 +15,12 @@ app.use('/api/orders', orderRoutes);
 
 // Chatbot QR
 let qrImageData = '';
-const botClient = require('./chatbot');
-botClient.on('qr', async (qr) => {
-  qrImageData = await QRCode.toDataURL(qr);
-});
+if (process.env.NODE_ENV !== 'production') {
+  const botClient = require('./chatbot');
+  botClient.on('qr', async (qr) => {
+    qrImageData = await QRCode.toDataURL(qr);
+  });
+}
 
 app.get('/qr', (req, res) => {
   if (qrImageData) {
