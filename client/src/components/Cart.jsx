@@ -27,7 +27,7 @@ export default function Cart({ cart, setCart, onClose }) {
       return
     }
     try {
-      const res = await axios.post('http://localhost:5000/api/orders/whatsapp', {
+      const res = await axios.post('https://burger-shop-server.onrender.com/api/orders/whatsapp', {
         items: cart,
         name,
         notes
