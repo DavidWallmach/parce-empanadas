@@ -6,7 +6,7 @@ export default function Navbar({ cartCount, onCartClick }) {
         <div className="flex items-center gap-2">
           <span className="text-3xl">🍔</span>
           <span className="text-xl font-bold text-amber-400 tracking-wide">
-            BURGER RAVE
+            PARCE EMPANADAS
           </span>
         </div>
 
