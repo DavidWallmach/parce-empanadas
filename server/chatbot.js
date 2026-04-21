@@ -80,6 +80,10 @@ async function sendVoice(msg, texto) {
 client.on('message', async (msg) => {
   const body = msg.body.toLowerCase();
 
+  // Ignorar mensajes largos (pedidos de la web) y mensajes propios
+  if (body.length > 100) return;
+  if (msg.fromMe) return;
+
   if (body === 'hola' || body === 'hi' || body === 'buenas' || body === 'buenos dias' || body === 'buenas tardes') {
     await sendVoice(msg,
       'Quiubo parce! Bienvenido a Parce Empanadas. ' +
@@ -141,7 +145,7 @@ client.on('message', async (msg) => {
   else if (body === '5' || body === 'ubicacion' || body === 'ubicación' || body === 'donde') {
     await sendVoice(msg,
       'Parce nos encontramos en Ciudad Juarez, Chihuahua. ' +
-      'Escríbenos y con gusto te damos la direccion exacta.'
+      'Escribenos y con gusto te damos la direccion exacta.'
     );
   }
   else if (body.includes('precio') || body.includes('cuanto')) {
