@@ -4,13 +4,16 @@ import toast from 'react-hot-toast'
 
 export default function Cart({ cart, setCart, onClose }) {
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
+  const [tipoEntrega, setTipoEntrega] = useState('domicilio')
+  const [direccion, setDireccion] = useState('')
+  const [metodoPago, setMetodoPago] = useState('efectivo')
+  const [loading, setLoading] = useState(false)
 
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0)
 
-  const removeItem = (id) => {
-    setCart(prev => prev.filter(i => i.id !== id))
-  }
+  const removeItem = (id) => setCart(prev => prev.filter(i => i.id !== id))
 
   const updateQty = (id, qty) => {
     if (qty < 1) return removeItem(id)
@@ -18,52 +21,70 @@ export default function Cart({ cart, setCart, onClose }) {
   }
 
   const handleOrder = async () => {
-    if (!name.trim()) {
-      toast.error('Por favor escribe tu nombre')
-      return
-    }
-    if (cart.length === 0) {
-      toast.error('Tu carrito está vacío')
-      return
-    }
+    if (!name.trim()) return toast.error('Por favor escribe tu nombre')
+    if (!phone.trim()) return toast.error('Por favor escribe tu telefono')
+    if (cart.length === 0) return toast.error('Tu carrito esta vacio')
+    if (tipoEntrega === 'domicilio' && !direccion.trim()) return toast.error('Por favor escribe tu direccion')
+
+    setLoading(true)
     try {
-      const res = await axios.post('https://burger-shop-server.onrender.com/api/orders/whatsapp', {
-        items: cart,
-        name,
-        notes
+      const items = cart.map(i => ({
+        nombre: i.name,
+        precio: i.price,
+        cantidad: i.qty
+      }))
+
+      const res = await axios.post('https://burger-shop-server.onrender.com/api/pedidos', {
+        telefono: phone,
+        items,
+        total,
+        metodoPago,
+        tipoEntrega,
+        direccionEntrega: direccion
       })
-      window.open(res.data.url, '_blank')
+
+      const { codigoConfirmacion } = res.data
+
+      const itemsList = cart.map(i => `• ${i.qty}x ${i.name} - $${i.price * i.qty}`).join('\n')
+      const message = encodeURIComponent(
+        `🥟 *Nuevo Pedido - Parce Empanadas*\n\n` +
+        `👤 Cliente: ${name}\n` +
+        `📞 Telefono: ${phone}\n\n` +
+        `📋 Pedido:\n${itemsList}\n\n` +
+        `💰 Total: $${total} MXN\n` +
+        `💳 Pago: ${metodoPago}\n` +
+        `🚚 Entrega: ${tipoEntrega}\n` +
+        `📍 Direccion: ${direccion || 'Recoger en tienda'}\n\n` +
+        `📝 Notas: ${notes || 'Ninguna'}\n\n` +
+        `🔑 Codigo de confirmacion: ${codigoConfirmacion}`
+      )
+
+      window.open(`https://wa.me/526481690255?text=${message}`, '_blank')
       setCart([])
       onClose()
-      toast.success('¡Pedido enviado por WhatsApp! 🎉')
+      toast.success('Pedido enviado exitosamente!')
+
     } catch (error) {
+      console.error(error)
       toast.error('Error al procesar el pedido')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md bg-zinc-900 h-full overflow-y-auto border-l border-zinc-700 flex flex-col">
-        
+
         <div className="flex justify-between items-center p-6 border-b border-zinc-700">
-          <h2 className="text-2xl font-black text-white">🛒 Tu Pedido</h2>
-          <button
-            onClick={onClose}
-            className="text-zinc-400 hover:text-white text-2xl font-bold"
-          >
-            ✕
-          </button>
+          <h2 className="text-2xl font-black text-white">Tu Pedido</h2>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white text-2xl font-bold">X</button>
         </div>
 
         <div className="flex-1 p-6">
           {cart.length === 0 ? (
-            <p className="text-zinc-500 text-center mt-12">Tu carrito está vacío</p>
+            <p className="text-zinc-500 text-center mt-12">Tu carrito esta vacio</p>
           ) : (
             <div className="space-y-4">
               {cart.map(item => (
@@ -74,19 +95,9 @@ export default function Cart({ cart, setCart, onClose }) {
                     <p className="text-amber-400 font-bold">${item.price * item.qty}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => updateQty(item.id, item.qty - 1)}
-                      className="w-7 h-7 bg-zinc-700 rounded-full text-white font-bold hover:bg-zinc-600"
-                    >
-                      -
-                    </button>
+                    <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-7 h-7 bg-zinc-700 rounded-full text-white font-bold hover:bg-zinc-600">-</button>
                     <span className="text-white font-bold w-4 text-center">{item.qty}</span>
-                    <button
-                      onClick={() => updateQty(item.id, item.qty + 1)}
-                      className="w-7 h-7 bg-amber-400 rounded-full text-zinc-950 font-bold hover:bg-amber-300"
-                    >
-                      +
-                    </button>
+                    <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-7 h-7 bg-amber-400 rounded-full text-zinc-950 font-bold hover:bg-amber-300">+</button>
                   </div>
                 </div>
               ))}
@@ -101,6 +112,54 @@ export default function Cart({ cart, setCart, onClose }) {
               onChange={e => setName(e.target.value)}
               className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
             />
+            <input
+              type="text"
+              placeholder="Tu telefono *"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
+            />
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTipoEntrega('domicilio')}
+                className={`flex-1 py-2 rounded-xl font-bold text-sm ${tipoEntrega === 'domicilio' ? 'bg-amber-400 text-zinc-950' : 'bg-zinc-800 text-zinc-400'}`}
+              >
+                A domicilio
+              </button>
+              <button
+                onClick={() => setTipoEntrega('recoger')}
+                className={`flex-1 py-2 rounded-xl font-bold text-sm ${tipoEntrega === 'recoger' ? 'bg-amber-400 text-zinc-950' : 'bg-zinc-800 text-zinc-400'}`}
+              >
+                Recoger
+              </button>
+            </div>
+
+            {tipoEntrega === 'domicilio' && (
+              <input
+                type="text"
+                placeholder="Tu direccion *"
+                value={direccion}
+                onChange={e => setDireccion(e.target.value)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
+              />
+            )}
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setMetodoPago('efectivo')}
+                className={`flex-1 py-2 rounded-xl font-bold text-sm ${metodoPago === 'efectivo' ? 'bg-amber-400 text-zinc-950' : 'bg-zinc-800 text-zinc-400'}`}
+              >
+                Efectivo
+              </button>
+              <button
+                onClick={() => setMetodoPago('tarjeta')}
+                className={`flex-1 py-2 rounded-xl font-bold text-sm ${metodoPago === 'tarjeta' ? 'bg-amber-400 text-zinc-950' : 'bg-zinc-800 text-zinc-400'}`}
+              >
+                Tarjeta
+              </button>
+            </div>
+
             <textarea
               placeholder="Notas del pedido (opcional)"
               value={notes}
@@ -118,9 +177,10 @@ export default function Cart({ cart, setCart, onClose }) {
           </div>
           <button
             onClick={handleOrder}
-            className="w-full bg-green-500 text-white py-4 rounded-full font-black text-lg hover:bg-green-400 transition-colors"
+            disabled={loading}
+            className="w-full bg-green-500 text-white py-4 rounded-full font-black text-lg hover:bg-green-400 transition-colors disabled:opacity-50"
           >
-            📲 Pedir por WhatsApp
+            {loading ? 'Procesando...' : 'Pedir por WhatsApp'}
           </button>
         </div>
 

@@ -43,7 +43,6 @@ async function sendVoice(msg, texto) {
   const tmpOgg = path.join(__dirname, 'tmp_voice.ogg');
 
   try {
-    // Generar audio con ElevenLabs
     const audioStream = await elevenlabs.textToSpeech.convert(VOICE_ID, {
       text: texto,
       model_id: 'eleven_multilingual_v2',
@@ -53,14 +52,12 @@ async function sendVoice(msg, texto) {
       }
     });
 
-    // Guardar MP3
     const writeStream = fs.createWriteStream(tmpMp3);
     for await (const chunk of audioStream) {
       writeStream.write(chunk);
     }
     await new Promise((resolve) => writeStream.end(resolve));
 
-    // Convertir MP3 a OGG para Android
     await new Promise((resolve, reject) => {
       exec(`ffmpeg -y -i "${tmpMp3}" -c:a libopus -b:a 64k "${tmpOgg}"`, (err) => {
         if (err) reject(err);
@@ -68,7 +65,6 @@ async function sendVoice(msg, texto) {
       });
     });
 
-    // Enviar como nota de voz
     const media = MessageMedia.fromFilePath(tmpOgg);
     await msg.reply(media, null, { sendAudioAsVoice: true });
 
@@ -84,51 +80,81 @@ async function sendVoice(msg, texto) {
 client.on('message', async (msg) => {
   const body = msg.body.toLowerCase();
 
-  if (body === 'hola' || body === 'hi' || body === 'buenas') {
+  if (body === 'hola' || body === 'hi' || body === 'buenas' || body === 'buenos dias' || body === 'buenas tardes') {
     await sendVoice(msg,
-      'Hola! Bienvenido a Burger RAVE. ' +
-      'Escribe 1 para ver el menú, ' +
+      'Quiubo parce! Bienvenido a Parce Empanadas. ' +
+      'Las mejores empanadas colombianas en Ciudad Juarez. ' +
+      'Escribe 1 para ver el menu, ' +
       '2 para hacer un pedido, ' +
-      '3 para horarios, ' +
-      '4 para ubicación.'
+      '3 para pedir para un evento, ' +
+      '4 para horarios, ' +
+      '5 para ubicacion.'
     );
   }
   else if (body === '1' || body === 'menu' || body === 'menú') {
     await sendVoice(msg,
-      'Nuestro menú es el siguiente. ' +
-      'Classic Burger por 89 pesos. ' +
-      'BBQ Smash por 109 pesos. ' +
-      'Chicken Crispy por 95 pesos. ' +
-      'Mushroom Swiss por 99 pesos. ' +
-      'Doble Smash por 119 pesos. ' +
-      'Veggie Burger por 85 pesos. ' +
-      'Escribe 2 para hacer tu pedido.'
+      'Parce te cuento lo que tenemos. ' +
+      'Empanada de carne a 20 pesitos. ' +
+      'Empanada de pollo a 20 pesitos. ' +
+      'Mixta de 6 unidades a 110 pesos. ' +
+      'Docena de carne a 200 pesos. ' +
+      'Docena de pollo a 200 pesos. ' +
+      'Combo evento de 50 empanadas a 950 pesos. ' +
+      'Escribe 2 para pedir o 3 si es para un evento.'
     );
   }
-  else if (body === '2' || body === 'pedido' || body === 'pedir') {
+  else if (body === '2' || body === 'pedido' || body === 'pedir' || body === 'quiero pedir') {
     await sendVoice(msg,
-      'Para hacer tu pedido visita nuestra página web y agrega lo que quieras al carrito. ' +
-      'O dinos directamente aquí qué quieres ordenar.'
+      'Listo parce! Dime que vas a querer. ' +
+      'Escribe A si quieres que te lo llevemos a tu casa. ' +
+      'O escribe B si prefieres pasar a recogerlo.'
     );
   }
-  else if (body === '3' || body === 'horarios' || body === 'horario') {
+  else if (body === 'a') {
     await sendVoice(msg,
-      'Nuestros horarios son los siguientes. ' +
-      'De lunes a viernes de 12 del mediodía a 10 de la noche. ' +
-      'Sábado y domingo de 11 de la mañana a 11 de la noche. ' +
-      'Te esperamos!'
+      'Chevere parce! Mandame tu ubicacion por favor. ' +
+      'Puedes compartir tu ubicacion en tiempo real desde WhatsApp. ' +
+      'O si prefieres escribe tu direccion completa.'
     );
   }
-  else if (body === '4' || body === 'ubicacion' || body === 'ubicación') {
+  else if (body === 'b') {
     await sendVoice(msg,
-      'Estamos ubicados en Ciudad Juárez, Chihuahua. ' +
-      'Escribe hola para ver el menú principal.'
+      'Perfecto parce! Nos encuentras en Ciudad Juarez, Chihuahua. ' +
+      'Cuando llegues avisanos y te tenemos listas tus empanadas.'
+    );
+  }
+  else if (body === '3' || body === 'evento' || body === 'eventos') {
+    await sendVoice(msg,
+      'Uy que chimba parce, vas a hacer un evento! ' +
+      'Dime cuantas empanadas necesitas y para que fecha. ' +
+      'Tenemos combos desde 50 empanadas en adelante. ' +
+      'Un administrador te contactara para darte la cotizacion.'
+    );
+  }
+  else if (body === '4' || body === 'horarios' || body === 'horario') {
+    await sendVoice(msg,
+      'Parce estamos abiertos de lunes a viernes de 12 del medio dia a 10 de la noche. ' +
+      'Sabados y domingos de 11 de la manana a 11 de la noche. ' +
+      'Te esperamos con las empanadas calienticas!'
+    );
+  }
+  else if (body === '5' || body === 'ubicacion' || body === 'ubicación' || body === 'donde') {
+    await sendVoice(msg,
+      'Parce nos encontramos en Ciudad Juarez, Chihuahua. ' +
+      'Escríbenos y con gusto te damos la direccion exacta.'
+    );
+  }
+  else if (body.includes('precio') || body.includes('cuanto')) {
+    await sendVoice(msg,
+      'Parce nuestras empanadas estan a 20 pesitos cada una. ' +
+      'La mixta de 6 a 110, la docena a 200 y el combo evento de 50 a 950 pesos. ' +
+      'Todas recien hechas y calienticas!'
     );
   }
   else {
     await sendVoice(msg,
-      'No entendí tu mensaje. ' +
-      'Escribe hola para ver las opciones disponibles.'
+      'Ay parce no te entendi bien. ' +
+      'Escribe hola para ver todas las opciones disponibles.'
     );
   }
 });
