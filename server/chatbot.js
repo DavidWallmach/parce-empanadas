@@ -127,7 +127,7 @@ client.on('message', async (msg) => {
   }
   else {
     await sendVoice(msg,
-      'No entendí tu mensaje pendejo migueel estas idiota o que parcero. ' +
+      'No entendí tu mensaje. ' +
       'Escribe hola para ver las opciones disponibles.'
     );
   }
