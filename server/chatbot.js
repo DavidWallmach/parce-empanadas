@@ -80,9 +80,22 @@ async function sendVoice(msg, texto) {
 client.on('message', async (msg) => {
   const body = msg.body.toLowerCase();
 
-  // Ignorar mensajes largos (pedidos de la web) y mensajes propios
-  if (body.length > 100) return;
+  // Ignorar mensajes propios
   if (msg.fromMe) return;
+
+  // Detectar pedidos desde la web
+  if (body.includes('nuevo pedido - parce empanadas')) {
+    await sendVoice(msg,
+      'Uy que chimba parce! Ya recibimos tu pedido. ' +
+      'En unos minuticos te lo tenemos listo. ' +
+      'Guarda tu codigo de confirmacion para cuando llegue el repartidor. ' +
+      'Cualquier duda escribenos aqui. Gracias parcero!'
+    );
+    return;
+  }
+
+  // Ignorar mensajes largos
+  if (body.length > 100) return;
 
   if (body === 'hola' || body === 'hi' || body === 'buenas' || body === 'buenos dias' || body === 'buenas tardes') {
     await sendVoice(msg,

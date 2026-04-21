@@ -30,14 +30,12 @@ router.post('/', async (req, res) => {
   try {
     const { telefono, items, total, metodoPago, tipoEntrega, direccionEntrega } = req.body;
 
-    // Buscar o crear usuario
     let usuario = await Usuario.findOne({ telefono });
     if (!usuario) {
       usuario = new Usuario({ telefono });
       await usuario.save();
     }
 
-    // Generar código de confirmación
     const codigoConfirmacion = Math.random().toString(36).substring(2, 8).toUpperCase();
 
     const pedido = new Pedido({
@@ -53,11 +51,13 @@ router.post('/', async (req, res) => {
 
     await pedido.save();
 
-    // Actualizar stats del usuario
     await Usuario.findByIdAndUpdate(usuario._id, {
       $inc: { totalPedidos: 1, totalGastado: total },
       esClienteRecurrente: usuario.totalPedidos >= 3
     });
+
+    // Emitir evento a cocina en tiempo real
+    req.io.emit('nuevo_pedido', pedido);
 
     res.json({ pedido, codigoConfirmacion });
   } catch (error) {
@@ -73,6 +73,10 @@ router.put('/:id/estado', async (req, res) => {
       { estado: req.body.estado },
       { new: true }
     );
+
+    // Emitir evento de actualizacion
+    req.io.emit('pedido_actualizado', pedido);
+
     res.json(pedido);
   } catch (error) {
     res.status(500).json({ error: error.message });

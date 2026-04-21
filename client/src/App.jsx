@@ -5,8 +5,10 @@ import Hero from './components/Hero'
 import Menu from './components/Menu'
 import Cart from './components/Cart'
 import Footer from './components/Footer'
+import Cocina from './pages/Cocina'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-export default function App() {
+function Tienda() {
   const [cart, setCart] = useState([])
   const [showCart, setShowCart] = useState(false)
 
@@ -26,10 +28,19 @@ export default function App() {
       <Navbar cartCount={totalItems} onCartClick={() => setShowCart(true)} />
       <Hero />
       <Menu onAdd={addToCart} />
-      {showCart && (
-        <Cart cart={cart} setCart={setCart} onClose={() => setShowCart(false)} />
-      )}
+      {showCart && <Cart cart={cart} setCart={setCart} onClose={() => setShowCart(false)} />}
       <Footer />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Tienda />} />
+        <Route path="/cocina" element={<Cocina />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
