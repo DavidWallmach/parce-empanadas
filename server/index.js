@@ -1,3 +1,4 @@
+const pagosRoutes = require('./routes/pagos');
 const express = require('express');
 const cors = require('cors');
 const QRCode = require('qrcode');
@@ -37,6 +38,7 @@ app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/pedidos', pedidoRoutes);
+app.use('/api/pagos', pagosRoutes);
 
 // Socket.io
 io.on('connection', (socket) => {
