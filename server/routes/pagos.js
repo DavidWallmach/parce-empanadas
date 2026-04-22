@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const stripe = require('stripe')('sk_test_51TP6sbBHRqR6pOTIkJH4i9mbpbEqj2VJw3J5qnMbaaKOqFKil9EhkzbpiyWZMGpdW5xPVdLRJk2SCaN29dOhU8lf00Pf9wEqgt');
-
+require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // Crear sesión de pago
 router.post('/crear-sesion', async (req, res) => {
   const { items, pedidoId, telefono } = req.body;
@@ -51,4 +51,4 @@ router.get('/verificar/:sessionId', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;    
