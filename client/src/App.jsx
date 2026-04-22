@@ -6,6 +6,7 @@ import Menu from './components/Menu'
 import Cart from './components/Cart'
 import Footer from './components/Footer'
 import Cocina from './pages/Cocina'
+import Repartidor from './pages/Repartidor'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function Tienda() {
@@ -40,6 +41,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Tienda />} />
         <Route path="/cocina" element={<Cocina />} />
+        <Route path="/repartidor" element={<Repartidor />} />
       </Routes>
     </BrowserRouter>
   )
