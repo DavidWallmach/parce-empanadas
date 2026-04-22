@@ -7,6 +7,8 @@ import Cart from './components/Cart'
 import Footer from './components/Footer'
 import Cocina from './pages/Cocina'
 import Repartidor from './pages/Repartidor'
+import PagoExitoso from './pages/PagoExitoso'
+import PagoCancelado from './pages/PagoCancelado'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function Tienda() {
@@ -42,6 +44,8 @@ export default function App() {
         <Route path="/" element={<Tienda />} />
         <Route path="/cocina" element={<Cocina />} />
         <Route path="/repartidor" element={<Repartidor />} />
+        <Route path="/pago-exitoso" element={<PagoExitoso />} />
+        <Route path="/pago-cancelado" element={<PagoCancelado />} />
       </Routes>
     </BrowserRouter>
   )

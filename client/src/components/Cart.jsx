@@ -34,7 +34,7 @@ export default function Cart({ cart, setCart, onClose }) {
         cantidad: i.qty
       }))
 
-      const res = await axios.post('https://burger-shop-server.onrender.com/api/pedidos', {
+      const res = await axios.post('http://localhost:5000/api/pedidos', {
         telefono: phone,
         items,
         total,
@@ -43,8 +43,20 @@ export default function Cart({ cart, setCart, onClose }) {
         direccionEntrega: direccion
       })
 
-      const { codigoConfirmacion } = res.data
+      const { pedido, codigoConfirmacion } = res.data
 
+      // Si paga con tarjeta redirigir a Stripe
+      if (metodoPago === 'tarjeta') {
+        const stripeRes = await axios.post('http://localhost:5000/api/pagos/crear-sesion', {
+          items: pedido.items,
+          pedidoId: pedido._id,
+          telefono: phone
+        })
+        window.location.href = stripeRes.data.url
+        return
+      }
+
+      // Si paga en efectivo abrir WhatsApp
       const itemsList = cart.map(i => `• ${i.qty}x ${i.name} - $${i.price * i.qty}`).join('\n')
       const message = encodeURIComponent(
         `🥟 *Nuevo Pedido - Parce Empanadas*\n\n` +
@@ -160,6 +172,13 @@ export default function Cart({ cart, setCart, onClose }) {
               </button>
             </div>
 
+            {metodoPago === 'tarjeta' && (
+              <div className="bg-blue-500/20 border border-blue-500 rounded-xl p-3">
+                <p className="text-blue-400 text-sm font-bold">💳 Pago seguro con Stripe</p>
+                <p className="text-zinc-400 text-xs mt-1">Seras redirigido a la pagina de pago seguro</p>
+              </div>
+            )}
+
             <textarea
               placeholder="Notas del pedido (opcional)"
               value={notes}
@@ -178,9 +197,9 @@ export default function Cart({ cart, setCart, onClose }) {
           <button
             onClick={handleOrder}
             disabled={loading}
-            className="w-full bg-green-500 text-white py-4 rounded-full font-black text-lg hover:bg-green-400 transition-colors disabled:opacity-50"
+            className={`w-full py-4 rounded-full font-black text-lg transition-colors disabled:opacity-50 ${metodoPago === 'tarjeta' ? 'bg-blue-500 text-white hover:bg-blue-400' : 'bg-green-500 text-white hover:bg-green-400'}`}
           >
-            {loading ? 'Procesando...' : 'Pedir por WhatsApp'}
+            {loading ? 'Procesando...' : metodoPago === 'tarjeta' ? '💳 Pagar con Tarjeta' : '📲 Pedir por WhatsApp'}
           </button>
         </div>
 
