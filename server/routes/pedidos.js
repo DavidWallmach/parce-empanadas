@@ -28,8 +28,7 @@ router.get('/estado/:estado', async (req, res) => {
 // Crear pedido
 router.post('/', async (req, res) => {
   try {
-    const { telefono, items, total, metodoPago, tipoEntrega, direccionEntrega } = req.body;
-
+    const { telefono, items, total, metodoPago, tipoEntrega, direccionEntrega, ubicacion } = req.body;
     let usuario = await Usuario.findOne({ telefono });
     if (!usuario) {
       usuario = new Usuario({ telefono });
@@ -39,15 +38,16 @@ router.post('/', async (req, res) => {
     const codigoConfirmacion = Math.random().toString(36).substring(2, 8).toUpperCase();
 
     const pedido = new Pedido({
-      usuario: usuario._id,
-      telefono,
-      items,
-      total,
-      metodoPago,
-      tipoEntrega,
-      direccionEntrega,
-      codigoConfirmacion
-    });
+  usuario: usuario._id,
+  telefono,
+  items,
+  total,
+  metodoPago,
+  tipoEntrega,
+  direccionEntrega,
+  ubicacion,
+  codigoConfirmacion
+});
 
     await pedido.save();
 

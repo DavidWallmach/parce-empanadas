@@ -109,12 +109,27 @@ export default function Repartidor() {
                     ))}
                   </div>
 
-                  {pedido.tipoEntrega === 'domicilio' && pedido.direccionEntrega && (
-                    <div className="bg-zinc-800 rounded-xl p-3">
-                      <p className="text-zinc-400 text-sm mb-1">📍 Direccion de entrega</p>
-                      <p className="text-white font-bold">{pedido.direccionEntrega}</p>
-                    </div>
-                  )}
+                  {pedido.tipoEntrega === 'domicilio' && (
+  <div className="bg-zinc-800 rounded-xl p-3 space-y-2">
+    <p className="text-zinc-400 text-sm">📍 Direccion de entrega</p>
+    {pedido.direccionEntrega && (
+      <p className="text-white font-bold">{pedido.direccionEntrega}</p>
+    )}
+    {pedido.ubicacion && pedido.ubicacion.lat && (
+      <a
+        href={`https://www.google.com/maps/dir/?api=1&destination=${pedido.ubicacion.lat},${pedido.ubicacion.lng}`}
+        target="_blank"
+        rel="noreferrer"
+        className="flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-xl font-bold text-sm hover:bg-blue-400 transition-colors"
+      >
+        🗺️ Abrir ruta en Google Maps
+      </a>
+    )}
+    {!pedido.ubicacion?.lat && !pedido.direccionEntrega && (
+      <p className="text-zinc-500 text-sm">Sin ubicacion disponible</p>
+    )}
+  </div>
+)}
 
                   {pedido.tipoEntrega === 'recoger' && (
                     <div className="bg-green-500/20 border border-green-500 rounded-xl p-3">

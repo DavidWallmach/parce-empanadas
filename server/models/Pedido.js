@@ -34,10 +34,15 @@ const pedidoSchema = new mongoose.Schema({
     enum: ['domicilio', 'recoger'],
     default: 'domicilio'
   },
+
   direccionEntrega: {
-    type: String,
-    default: ''
-  },
+  type: String,
+  default: ''
+},
+  ubicacion: {
+  lat: { type: Number, default: null },
+  lng: { type: Number, default: null }
+},
   codigoConfirmacion: {
     type: String,
     default: ''

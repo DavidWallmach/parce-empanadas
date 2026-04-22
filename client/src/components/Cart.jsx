@@ -10,6 +10,24 @@ export default function Cart({ cart, setCart, onClose }) {
   const [direccion, setDireccion] = useState('')
   const [metodoPago, setMetodoPago] = useState('efectivo')
   const [loading, setLoading] = useState(false)
+  const [ubicacion, setUbicacion] = useState(null)
+
+const obtenerUbicacion = () => {
+  if (!navigator.geolocation) {
+    toast.error('Tu navegador no soporta geolocalización')
+    return
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      setUbicacion({
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      })
+      toast.success('Ubicacion obtenida!')
+    },
+    () => toast.error('No se pudo obtener la ubicacion')
+  )
+}
 
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0)
 
@@ -34,14 +52,15 @@ export default function Cart({ cart, setCart, onClose }) {
         cantidad: i.qty
       }))
 
-      const res = await axios.post('http://localhost:5000/api/pedidos', {
-        telefono: phone,
-        items,
-        total,
-        metodoPago,
-        tipoEntrega,
-        direccionEntrega: direccion
-      })
+const res = await axios.post('http://localhost:5000/api/pedidos', {
+  telefono: phone,
+  items,
+  total,
+  metodoPago,
+  tipoEntrega,
+  direccionEntrega: direccion,
+  ubicacion
+})
 
       const { pedido, codigoConfirmacion } = res.data
 
@@ -146,16 +165,29 @@ export default function Cart({ cart, setCart, onClose }) {
                 Recoger
               </button>
             </div>
-
-            {tipoEntrega === 'domicilio' && (
-              <input
-                type="text"
-                placeholder="Tu direccion *"
-                value={direccion}
-                onChange={e => setDireccion(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
-              />
-            )}
+{tipoEntrega === 'domicilio' && (
+  <div className="space-y-2">
+    <input
+      type="text"
+      placeholder="Tu direccion *"
+      value={direccion}
+      onChange={e => setDireccion(e.target.value)}
+      className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
+    />
+    <button
+      type="button"
+      onClick={obtenerUbicacion}
+      className={`w-full py-2 rounded-xl font-bold text-sm transition-colors ${ubicacion ? 'bg-green-500 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'}`}
+    >
+      {ubicacion ? '✅ Ubicacion obtenida!' : '📍 Compartir mi ubicacion GPS'}
+    </button>
+    {ubicacion && (
+      <p className="text-green-400 text-xs text-center">
+        Lat: {ubicacion.lat.toFixed(4)}, Lng: {ubicacion.lng.toFixed(4)}
+      </p>
+    )}
+  </div>
+)}
 
             <div className="flex gap-2">
               <button
