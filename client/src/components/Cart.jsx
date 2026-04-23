@@ -89,10 +89,12 @@ const res = await axios.post('https://burger-shop-server.onrender.com/api/pedido
         `🔑 Codigo de confirmacion: ${codigoConfirmacion}`
       )
 
-      window.open(`https://wa.me/526481690255?text=${message}`, '_blank')
       setCart([])
-      onClose()
-      toast.success('Pedido enviado exitosamente!')
+onClose()
+toast.success('Pedido enviado! Abriendo WhatsApp...')
+setTimeout(() => {
+  window.location.href = `https://wa.me/526481690255?text=${message}`
+}, 1000)
 
     } catch (error) {
       console.error(error)
