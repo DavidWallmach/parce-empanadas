@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { io } from 'socket.io-client'
 import axios from 'axios'
 
-const socket = io('http://localhost:5000')
+const socket = io('https://burger-shop-server.onrender.com')
 
 export default function Cocina() {
   const [pedidos, setPedidos] = useState([])
@@ -26,7 +26,7 @@ export default function Cocina() {
 
   const cargarPedidos = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/pedidos/estado/pendiente')
+      const res = await axios.get('https://burger-shop-server.onrender.com/api/pedidos/estado/pendiente')
       setPedidos(res.data)
     } catch (error) {
       console.error('Error:', error)
@@ -35,7 +35,7 @@ export default function Cocina() {
 
   const actualizarEstado = async (id, estado) => {
     try {
-      await axios.put(`http://localhost:5000/api/pedidos/${id}/estado`, { estado })
+      await axios.put(`https://burger-shop-server.onrender.com/api/pedidos/${id}/estado`, { estado })
     } catch (error) {
       console.error('Error:', error)
     }

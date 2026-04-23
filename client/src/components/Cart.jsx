@@ -52,7 +52,7 @@ const obtenerUbicacion = () => {
         cantidad: i.qty
       }))
 
-const res = await axios.post('http://localhost:5000/api/pedidos', {
+const res = await axios.post('https://burger-shop-server.onrender.com/api/pedidos', {
   telefono: phone,
   items,
   total,
@@ -66,8 +66,7 @@ const res = await axios.post('http://localhost:5000/api/pedidos', {
 
       // Si paga con tarjeta redirigir a Stripe
       if (metodoPago === 'tarjeta') {
-        const stripeRes = await axios.post('http://localhost:5000/api/pagos/crear-sesion', {
-          items: pedido.items,
+        const stripeRes = await axios.post('https://burger-shop-server.onrender.com/api/pagos/crear-sesion', {          items: pedido.items,
           pedidoId: pedido._id,
           telefono: phone
         })

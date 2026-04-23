@@ -3,7 +3,7 @@ import { io } from 'socket.io-client'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 
-const socket = io('http://localhost:5000')
+const socket = io('https://burger-shop-server.onrender.com')
 
 export default function Repartidor() {
   const [pedidos, setPedidos] = useState([])
@@ -25,7 +25,7 @@ export default function Repartidor() {
 
   const cargarPedidos = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/pedidos/estado/en_camino')
+      const res = await axios.get('https://burger-shop-server.onrender.com/api/pedidos/estado/en_camino')
       setPedidos(res.data)
     } catch (error) {
       console.error('Error:', error)
@@ -41,7 +41,7 @@ export default function Repartidor() {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/pedidos/${pedido._id}/estado`, {
+      await axios.put(`https://burger-shop-server.onrender.com/api/pedidos/${pedido._id}/estado`, {
         estado: 'entregado'
       })
       toast.success('Pedido entregado exitosamente!')
