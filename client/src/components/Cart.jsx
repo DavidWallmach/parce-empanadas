@@ -40,7 +40,7 @@ const obtenerUbicacion = () => {
 
   const handleOrder = async () => {
     if (!name.trim()) return toast.error('Por favor escribe tu nombre')
-    if (!phone.trim()) return toast.error('Por favor escribe tu telefono')
+    if  (!phone.trim()) return toast.error('Por favor escribe tu telefono')
     if (cart.length === 0) return toast.error('Tu carrito esta vacio')
     if (tipoEntrega === 'domicilio' && !direccion.trim()) return toast.error('Por favor escribe tu direccion')
 
@@ -54,6 +54,7 @@ const obtenerUbicacion = () => {
 
 const res = await axios.post('https://burger-shop-server.onrender.com/api/pedidos', {
   telefono: phone,
+  nombre: name,
   items,
   total,
   metodoPago,

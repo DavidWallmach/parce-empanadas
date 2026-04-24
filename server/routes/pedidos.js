@@ -28,12 +28,18 @@ router.get('/estado/:estado', async (req, res) => {
 // Crear pedido
 router.post('/', async (req, res) => {
   try {
-    const { telefono, items, total, metodoPago, tipoEntrega, direccionEntrega, ubicacion } = req.body;
+    const { telefono, items, total, metodoPago, tipoEntrega, direccionEntrega, ubicacion, nombre } = req.body;
     let usuario = await Usuario.findOne({ telefono });
-    if (!usuario) {
-      usuario = new Usuario({ telefono });
-      await usuario.save();
-    }
+if (!usuario) {
+  usuario = new Usuario({ telefono, nombre });
+  await usuario.save();
+} else {
+  // Actualizar nombre si no lo tiene
+  if (!usuario.nombre && nombre) {
+    usuario.nombre = nombre;
+    await usuario.save();
+  }
+}
 
     const codigoConfirmacion = Math.random().toString(36).substring(2, 8).toUpperCase();
 
